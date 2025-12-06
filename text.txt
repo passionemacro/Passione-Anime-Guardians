@@ -134,6 +134,7 @@ local DeleteMacroButton = MacroTab:Button({
 					for i,v in ipairs(MacroDropdown.Values) do
 						if v.Title == selected.Title then
 							table.remove(MacroDropdown.Values, i)
+							delfile("Passione/" .. selected.Title .. ".json")
 							break
 						end
 					end
