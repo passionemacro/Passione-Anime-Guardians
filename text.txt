@@ -1,3 +1,17 @@
+local Http = game:GetService("HttpService")
+
+local function Encode(data)
+	return Http:JSONEncode(data)
+end
+
+local function Decode(data)
+	return Http:JSONDecode(data)
+end
+
+if not isfolder("Passione") then
+	makefolder("Passione")
+end
+
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 
 WindUI:AddTheme({
@@ -90,6 +104,7 @@ local MacroNameInput = MacroTab:Input({
     		Duration = 3, -- 3 seconds
     		Icon = "check",
 		})
+		writefile("Passione/" .. input .. ".json", " ")
    end
 })
 local DeleteMacroButton = MacroTab:Button({
