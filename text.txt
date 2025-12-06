@@ -1,43 +1,132 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-local Window = Rayfield:CreateWindow({
-   Name = "Passione",
-   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
-   LoadingTitle = "Anime Guardians Script",
-   LoadingSubtitle = "by Passione",
-   ShowText = "Passione", -- for mobile users to unhide rayfield, change if you'd like
-   Theme = "Amethyst", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 
-   ToggleUIKeybind = "K", -- The keybind to toggle the UI visibility (string like "K" or Enum.KeyCode)
-
-   DisableRayfieldPrompts = false,
-   DisableBuildWarnings = false, -- Prevents Rayfield from warning when the script has a version mismatch with the interface
-
-   ConfigurationSaving = {
-      Enabled = true,
-      FolderName = nil, -- Create a custom folder for your hub/game
-      FileName = "Big Hub"
-   },
-
-   Discord = {
-      Enabled = false, -- Prompt the user to join your Discord server if their executor supports it
-      Invite = "noinvitelink", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ ABCD would be ABCD
-      RememberJoins = true -- Set this to false to make them join the discord every time they load it up
-   },
-
-   KeySystem = false, -- Set this to true to use our key system
-   KeySettings = {
-      Title = "Untitled",
-      Subtitle = "Key System",
-      Note = "No method of obtaining the key is provided", -- Use this to tell the user how to get a key
-      FileName = "Key", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
-      SaveKey = true, -- The user's key will be saved, but if you change the key, they will be unable to use your script
-      GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
-      Key = {"Hello"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
-   }
+WindUI:AddTheme({
+    Name = "My Theme", -- theme name
+    
+    Accent = Color3.fromHex("#18181b"),
+    Background = WindUI:Gradient({                                                      
+        ["0"] = { Color = Color3.fromHex("#ba3fba"), Transparency = 0 },            
+        ["100"]   = { Color = Color3.fromHex("#000088"), Transparency = 0 },        
+    }, {                                                                            
+        Rotation = 45,                                                               
+    }),
+    Outline = Color3.fromHex("#FFFFFF"),
+    Text = Color3.fromHex("#FFFFFF"),
+    Placeholder = Color3.fromHex("#7a7a7a"),
+    Button = Color3.fromHex("#52525b"),
+    Icon = Color3.fromHex("#a1a1aa"),
 })
-local MainTab = Window:CreateTab("Main", 4483362458) -- Title, Image
-local MainSection = MainTab:CreateSection("Game Settings")
-local MacroTab = Window:CreateTab("Macro", 4483362458) -- Title, Image
-local SummonTab = Window:CreateTab("Summon", 4483362458) -- Title, Image
-local TraitsTab = Window:CreateTab("Traits", 4483362458) -- Title, Image
-local MiscTab = Window:CreateTab("Misc", 4483362458) -- Title, Image
+
+local Window = WindUI:CreateWindow({
+    Title = "Anime Guardians",
+    Icon = "door-open", -- lucide icon
+    Author = "Passione",
+    Folder = "Passione",
+    
+    -- ↓ This all is Optional. You can remove it.
+    Size = UDim2.fromOffset(700, 460),
+    MinSize = Vector2.new(560, 350),
+    MaxSize = Vector2.new(850, 560),
+    Transparent = true,
+    Theme = "My Theme",
+    Resizable = true,
+    SideBarWidth = 200,
+    BackgroundImageTransparency = 0.42,
+    HideSearchBar = true,
+    ScrollBarEnabled = false,
+})
+local GameTab = Window:Tab({
+    Title = "Game",
+    Icon = "gamepad-2", -- optional
+    Locked = false,
+})
+local MacroTab = Window:Tab({
+    Title = "Macro",
+    Icon = "play", -- optional
+    Locked = false,
+})
+local StepTracker = MacroTab:Paragraph({
+    Title = "Steps",
+    Desc = [[
+Unit:
+Action:
+Cost:
+Waiting For: ]],
+    Image = "",
+    ImageSize = 30,
+    Thumbnail = "",
+    ThumbnailSize = 80,
+    Locked = false,
+})
+local MacroDropdown = MacroTab:Dropdown({
+    Title = "Advanced Dropdown",
+    Desc = "Dropdown Description",
+    Values = {},
+    Value = nil,
+    Callback = function(option) 
+        print("Category selected: " .. option.Title .. " with icon " .. option.Icon) 
+    end
+})
+local MacroNameInput = MacroTab:Input({
+    Title = "Macro Name",
+    Desc = "Name of the macro file.",
+    Value = nil,
+    InputIcon = "folder-pen",
+    Type = "Input", -- or "Textarea"
+    Placeholder = "Enter Macro Name",
+    Callback = function(input)
+		if input == nil or input == "" then 
+			return 
+		end
+		local dropdowninput = {
+		Title = input,
+		Icon = " ",
+		}
+		table.insert(MacroDropdown.Values, dropdowninput)
+		MacroDropdown:Refresh(MacroDropdown.Values)
+		WindUI:Notify({
+    		Title = "Created File",
+    		Content = "Created file: " .. input,
+    		Duration = 3, -- 3 seconds
+    		Icon = "check",
+		})
+   end
+})
+local DeleteMacroButton = MacroTab:Button({
+    Title = "Delete selected macro",
+    Color = Color3.fromHex("ffffff"), -- paint the button
+    Justify = "Center", -- align items in the center (Center or Between or Left or Right)
+    IconAlign = "Left", -- Left or Right of the text
+    Icon = "", -- removing icon
+    Callback = function()
+        WindUI:Popup({
+    Title = "Delete Macro",
+    Icon = "info",
+    Content = "Are you sure you want to delete the macro file?",
+    Buttons = {
+        {
+            Title = "Cancel",
+            Callback = function() end,
+            Variant = "Tertiary",
+        },
+        {
+            Title = "Continue",
+            Icon = "arrow-right",
+            Callback = function() 
+					local selected = MacroDropdown.Value
+					if not selected then return end
+					
+					for i,v in ipairs(MacroDropdown.Values) do
+						if v.Title == selected.Title then
+							table.remove(MacroDropdown.Values, i)
+							break
+						end
+					end
+					MacroDropdown:Refresh(MacroDropdown.Values)
+				end,
+            Variant = "Primary",
+        }
+    }
+})
+    end
+})
